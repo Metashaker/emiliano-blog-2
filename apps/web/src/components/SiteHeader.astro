@@ -1,0 +1,30 @@
+---
+import { useTranslations, otherLang, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** URL of the current page in the other locale, or null if none exists. */
+  switchHref: string | null;
+}
+
+const { lang, switchHref } = Astro.props;
+const t = useTranslations(lang);
+const other = otherLang(lang);
+---
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href={`/${lang}/`}>{t('site.title')}</a>
+    <nav class="nav" aria-label="Primary">
+      <a href={`/${lang}/`}>{t('nav.home')}</a>
+      {switchHref ? (
+        <a class="lang-switch" href={switchHref} lang={other} hreflang={other}>
+          {t('lang.switchTo')}
+        </a>
+      ) : (
+        <span class="lang-switch" aria-disabled="true" title={t('post.noTranslation')}>
+          {t('lang.switchTo')}
+        </span>
+      )}
+    </nav>
+  </div>
+</header>

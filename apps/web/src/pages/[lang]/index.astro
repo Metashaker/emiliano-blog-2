@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import PostCard from '../../components/PostCard.astro';
+import MeanderDivider from '../../components/MeanderDivider.astro';
+import { getPosts } from '../../lib/ghost';
+import { locales, useTranslations, otherLang, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const posts = await getPosts(lang);
+
+const switchHref = `/${otherLang(lang)}/`;
+---
+<BaseLayout lang={lang} switchHref={switchHref} title={t('index.heading')}>
+  <Hero lang={lang} />
+
+  <section class="wrap writing" id="writing">
+    <MeanderDivider />
+    <p class="eyebrow reveal">{t('index.heading')}</p>
+    <ul class="post-list">
+      {posts.map((post) => <PostCard post={post} />)}
+    </ul>
+  </section>
+</BaseLayout>

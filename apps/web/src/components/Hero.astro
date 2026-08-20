@@ -1,0 +1,218 @@
+---
+import { useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const COLS = 9;
+const columns = Array.from({ length: COLS }, (_, i) => i);
+const slot = 1200 / COLS;
+---
+<section class="hero" aria-label={t('site.title')}>
+  <canvas id="hero-sky" class="hero-sky" aria-hidden="true"></canvas>
+
+  <svg class="hero-colonnade" viewBox="0 0 1200 240" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#0c0e18" />
+        <stop offset="1" stop-color="#04050a" />
+      </linearGradient>
+    </defs>
+    <!-- architrave -->
+    <rect x="0" y="0" width="1200" height="24" fill="url(#stone)" />
+    <rect x="0" y="0" width="1200" height="2" fill="#c9a24b" opacity="0.35" />
+    {columns.map((i) => {
+      const cx = i * slot + slot / 2;
+      const w = 58;
+      const topW = w * 0.86;
+      return (
+        <g fill="url(#stone)">
+          <rect x={cx - w / 2 - 6} y={24} width={w + 12} height={12} />
+          <polygon points={`${cx - topW / 2},36 ${cx + topW / 2},36 ${cx + w / 2},228 ${cx - w / 2},228`} />
+          <rect x={cx - w / 2 - 8} y={228} width={w + 16} height={12} />
+        </g>
+      );
+    })}
+  </svg>
+
+  <div class="hero-content wrap">
+    <p class="hero-eyebrow reveal">{t('site.title')} · Journal</p>
+    <h1 class="hero-title reveal">{t('site.tagline')}</h1>
+    <p class="hero-sub reveal">{t('index.intro')}</p>
+    <a class="hero-cue" href="#writing" aria-label="Scroll to writing">
+      <span>Scroll</span>
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+    </a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 94vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background:
+      radial-gradient(70% 55% at 78% 30%, rgba(201, 162, 75, 0.16), transparent 60%),
+      radial-gradient(60% 50% at 10% 20%, rgba(96, 88, 170, 0.14), transparent 55%),
+      linear-gradient(180deg, #060812 0%, #0a0d18 60%, #05070e 100%);
+  }
+  .hero-sky { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+  .hero-colonnade {
+    position: absolute; left: 0; right: 0; bottom: -1px; z-index: 1;
+    width: 100%; height: clamp(130px, 24vh, 240px);
+    pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 2; padding-bottom: 6vh; }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 12px; letter-spacing: 0.34em; text-transform: uppercase;
+    color: var(--gold); margin: 0 0 22px;
+  }
+  .hero-title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(48px, 9vw, 116px);
+    line-height: 0.98;
+    letter-spacing: 0.01em;
+    margin: 0;
+    max-width: 15ch;
+    color: var(--marble);
+    text-shadow: 0 0 60px rgba(201, 162, 75, 0.18);
+  }
+  .hero-sub {
+    font-family: var(--sans);
+    font-size: clamp(17px, 2vw, 21px);
+    color: var(--muted);
+    max-width: 46ch;
+    margin: 28px 0 0;
+    line-height: 1.55;
+  }
+  .hero-cue {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 44px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+  }
+  .hero-cue:hover { color: var(--gold-soft); }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-cue svg { animation: bob 1.8s ease-in-out infinite; }
+  }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+
+  @media (max-width: 560px) {
+    .hero { min-height: 88vh; }
+    .hero-title { font-size: clamp(40px, 13vw, 64px); }
+  }
+</style>
+
+<script>
+  const canvas = document.getElementById('hero-sky') as HTMLCanvasElement | null;
+  const hero = canvas?.closest('.hero') as HTMLElement | null;
+  if (canvas && hero) {
+    const ctx = canvas.getContext('2d')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let w = 0, h = 0;
+    let stars: { x: number; y: number; r: number; b: number; tw: number; ph: number; depth: number; gold: boolean }[] = [];
+    let scrollY = 0;
+
+    function resize() {
+      w = hero.clientWidth;
+      h = hero.clientHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.min(260, Math.floor((w * h) / 7000));
+      stars = [];
+      for (let i = 0; i < n; i++) {
+        const depth = Math.random();
+        stars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: depth * 1.4 + 0.25,
+          b: Math.random() * 0.5 + 0.2,
+          tw: Math.random() * 0.02 + 0.004,
+          ph: Math.random() * Math.PI * 2,
+          depth,
+          gold: Math.random() < 0.12,
+        });
+      }
+    }
+
+    function drawPlanet(t: number) {
+      const cx = w * 0.8;
+      const cy = h * 0.32 - scrollY * 0.12;
+      const r = Math.min(w, h) * 0.2;
+
+      // atmosphere glow
+      let g = ctx.createRadialGradient(cx, cy, r * 0.7, cx, cy, r * 2.3);
+      g.addColorStop(0, 'rgba(201,162,75,0.20)');
+      g.addColorStop(1, 'rgba(201,162,75,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(cx, cy, r * 2.3, 0, 6.283); ctx.fill();
+
+      // orbital ring (behind)
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(-0.46);
+      ctx.scale(1, 0.26);
+      ctx.strokeStyle = 'rgba(201,162,75,0.5)';
+      ctx.lineWidth = 2 / 0.26 * 0.5;
+      ctx.beginPath(); ctx.arc(0, 0, r * 1.55, 0, 6.283); ctx.stroke();
+      ctx.restore();
+
+      // body — lit from upper-right
+      const lx = cx + r * 0.45, ly = cy - r * 0.45;
+      const bg = ctx.createRadialGradient(lx, ly, r * 0.1, cx, cy, r * 1.15);
+      bg.addColorStop(0, '#f2dfa6');
+      bg.addColorStop(0.32, '#c9a24b');
+      bg.addColorStop(0.72, '#5a4826');
+      bg.addColorStop(1, '#0b0912');
+      ctx.fillStyle = bg;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.283); ctx.fill();
+
+      // rim light on lit edge
+      ctx.strokeStyle = 'rgba(233,204,140,0.55)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(cx, cy, r, -2.0, -0.15); ctx.stroke();
+
+      // orbiting moon
+      const a = reduce ? 0.7 : t * 0.00025;
+      const rx = r * 1.55, ry = r * 1.55 * 0.26, rot = -0.46;
+      const ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
+      const mx = cx + (ex * Math.cos(rot) - ey * Math.sin(rot));
+      const my = cy + (ex * Math.sin(rot) + ey * Math.cos(rot));
+      ctx.fillStyle = '#e3c987';
+      ctx.beginPath(); ctx.arc(mx, my, 3.2, 0, 6.283); ctx.fill();
+    }
+
+    function draw(t: number) {
+      ctx.clearRect(0, 0, w, h);
+      for (const s of stars) {
+        const py = s.y - scrollY * (0.05 + s.depth * 0.25);
+        let a = reduce ? s.b : s.b + Math.sin(t * s.tw + s.ph) * 0.28;
+        if (a < 0.05) a = 0.05;
+        ctx.beginPath();
+        ctx.arc(s.x, ((py % h) + h) % h, s.r, 0, 6.283);
+        ctx.fillStyle = s.gold ? `rgba(227,201,135,${a})` : `rgba(236,231,218,${a})`;
+        ctx.fill();
+      }
+      drawPlanet(t);
+      if (!reduce) requestAnimationFrame(draw);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+    if (reduce) draw(0); else requestAnimationFrame(draw);
+  }
+</script>

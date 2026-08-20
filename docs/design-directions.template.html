@@ -1,0 +1,448 @@
+<title>Design Directions — Aether</title>
+<style>
+/* __FONT_FACES__ */
+
+:root {
+  --ink: #0a0b10;
+  --frame: #101219;
+  --frame-line: #232838;
+  --frame-fg: #d7dae4;
+  --frame-muted: #7c8296;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+
+#pagestars { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; }
+
+.page {
+  background:
+    radial-gradient(1000px 500px at 80% -10%, rgba(120,110,200,0.10), transparent 60%),
+    var(--ink);
+  color: var(--frame-fg);
+  font-family: "Sora", -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: 100vh;
+}
+.container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+/* ---- Gallery head ---- */
+.head { padding: 72px 0 28px; }
+.head .kicker {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: #b89452; margin: 0 0 16px;
+}
+.head h1 {
+  font-family: "Cinzel", serif;
+  font-size: clamp(34px, 6vw, 60px);
+  letter-spacing: 0.04em;
+  margin: 0 0 16px;
+  text-wrap: balance;
+}
+.head p {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 19px; line-height: 1.6; color: #b7bccb;
+  max-width: 62ch; margin: 0;
+}
+.note {
+  margin-top: 20px; font-family: "IBM Plex Mono", monospace;
+  font-size: 12.5px; color: var(--frame-muted); line-height: 1.6;
+  max-width: 70ch;
+  border-left: 2px solid var(--frame-line); padding-left: 14px;
+}
+
+/* ---- Legend ---- */
+.legend {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px; margin: 34px 0 8px;
+}
+.legend div {
+  border: 1px solid var(--frame-line); border-radius: 6px; padding: 14px 16px;
+  background: rgba(255,255,255,0.015);
+}
+.legend h4 {
+  margin: 0 0 5px; font-family: "IBM Plex Mono", monospace;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #b89452;
+}
+.legend p { margin: 0; font-size: 13.5px; color: var(--frame-muted); line-height: 1.5; }
+
+/* ---- Grid of tiles ---- */
+.grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 22px; padding: 30px 0 90px;
+}
+
+.tile {
+  --accent2: var(--accent);
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid color-mix(in srgb, var(--fg) 14%, transparent);
+  border-radius: 10px;
+  padding: 26px 26px 22px;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--body);
+}
+.tile::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(420px 200px at 85% -8%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.tile > * { position: relative; z-index: 1; }
+
+.tile-top {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 22px;
+  font-family: "IBM Plex Mono", monospace;
+}
+.tile-top .idx { font-size: 12px; color: var(--accent); letter-spacing: 0.1em; }
+.tile-top .tname {
+  font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--fg) 62%, transparent);
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 12px;
+}
+.headline {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(26px, 3vw, 32px);
+  line-height: 1.08;
+  margin: 0 0 14px;
+  color: var(--fg);
+  text-wrap: balance;
+}
+.tile.wide .headline {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: clamp(21px, 2.4vw, 26px);
+  line-height: 1.18;
+}
+.meta {
+  font-family: var(--mono);
+  font-size: 11.5px; letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--fg) 52%, transparent);
+  margin: 0 0 14px;
+}
+.excerpt {
+  font-family: var(--body);
+  font-size: 16px; line-height: 1.62;
+  color: color-mix(in srgb, var(--fg) 82%, transparent);
+  margin: 0 0 20px;
+  max-width: 42ch;
+}
+.read {
+  align-self: flex-start;
+  font-family: var(--mono);
+  font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  padding: 8px 16px; border-radius: 4px;
+  margin-bottom: auto;
+}
+
+.tile-foot { margin-top: 24px; }
+.swatches { display: flex; gap: 6px; margin-bottom: 12px; }
+.sw { width: 26px; height: 14px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.14); }
+.channels {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px; letter-spacing: 0.03em;
+  color: color-mix(in srgb, var(--fg) 55%, transparent);
+  margin: 0 0 4px;
+}
+.fonts {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px; letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--fg) 40%, transparent);
+  margin: 0;
+}
+
+/* ---- Moods ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .tile.glow .headline { text-shadow: 0 0 26px color-mix(in srgb, var(--accent) 55%, transparent); }
+  .tile.glow .read { box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 38%, transparent); }
+}
+.tile.duo .headline {
+  background: linear-gradient(100deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.tile.aurora::before {
+  background:
+    radial-gradient(360px 200px at 12% 0%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 70%),
+    radial-gradient(360px 220px at 92% 8%, color-mix(in srgb, var(--accent2) 30%, transparent), transparent 70%);
+}
+.tile.scan::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+}
+
+.foot-note {
+  padding: 0 0 80px; font-family: "IBM Plex Mono", monospace;
+  font-size: 12px; color: var(--frame-muted); text-align: center;
+}
+
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<canvas id="pagestars" aria-hidden="true"></canvas>
+
+<div class="page">
+  <div class="container">
+    <header class="head">
+      <p class="kicker">Aether · Design Study</p>
+      <h1>Thirteen Ways of Looking at a Blog</h1>
+      <p>The same post rendered in thirteen visual directions — spanning pure editorial (every.to), technical precision (ampcode), and mythic dark atmosphere (Hermes), blended toward one brief: Greek, in space, in a cyberpunk world. Pick the feel; we build it.</p>
+      <p class="note">These use the real target typefaces (Fraunces, Cormorant, Cinzel, Newsreader, Orbitron, Chakra Petch, Sora, IBM Plex Mono, Marcellus, Audiowide), embedded directly. Every tile shows the identical article so you compare style, not content.</p>
+    </header>
+
+    <section class="legend" aria-label="Reference influences">
+      <div><h4>every.to</h4><p>Editorial rigor — literary serif, generous measure, near-colorless restraint.</p></div>
+      <div><h4>ampcode</h4><p>Technical precision — mono labels, high contrast, a single hot accent.</p></div>
+      <div><h4>Hermes</h4><p>Mythic atmosphere — dark cosmic ground, gilt gold, celestial motifs.</p></div>
+      <div><h4>Cyberpunk</h4><p>High-tech neon — glow, chrome, magenta/cyan, synthwave energy.</p></div>
+    </section>
+
+    <main class="grid">
+
+      <!-- 1 -->
+      <article class="tile" style="--bg:#f3eee3;--fg:#181510;--accent:#8a6d24;--display:'Fraunces';--body:'Newsreader';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">01</span><span class="tname">Athenaeum</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#f3eee3"></span><span class="sw" style="background:#181510"></span><span class="sw" style="background:#8a6d24"></span></div>
+          <p class="channels">every.to — light editorial</p>
+          <p class="fonts">Fraunces / Newsreader / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 2 -->
+      <article class="tile" style="--bg:#0a0d18;--fg:#ece7da;--accent:#c9a24b;--display:'Cormorant Garamond';--body:'Sora';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">02</span><span class="tname">Marble &amp; Machine</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#0a0d18"></span><span class="sw" style="background:#ece7da"></span><span class="sw" style="background:#c9a24b"></span></div>
+          <p class="channels">Hermes × ampcode — classical display, modern body</p>
+          <p class="fonts">Cormorant / Sora / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 3 -->
+      <article class="tile wide" style="--bg:#0b0a12;--fg:#e8e2d0;--accent:#d4af37;--display:'Cinzel';--body:'Newsreader';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">03</span><span class="tname">Gilded Void</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#0b0a12"></span><span class="sw" style="background:#e8e2d0"></span><span class="sw" style="background:#d4af37"></span></div>
+          <p class="channels">Hermes — temple in space</p>
+          <p class="fonts">Cinzel / Newsreader / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 4 -->
+      <article class="tile" style="--bg:#0d0d0d;--fg:#e6e4dd;--accent:#ff7a1a;--display:'Sora';--body:'Sora';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">04</span><span class="tname">Terminal Oracle</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline" style="font-weight:700;">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#0d0d0d"></span><span class="sw" style="background:#e6e4dd"></span><span class="sw" style="background:#ff7a1a"></span></div>
+          <p class="channels">ampcode — technical, one accent</p>
+          <p class="fonts">Sora / Sora / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 5 -->
+      <article class="tile wide glow duo scan" style="--bg:#08060f;--fg:#f0e9ff;--accent:#ff2fb0;--accent2:#21e6ff;--display:'Cinzel';--body:'Sora';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">05</span><span class="tname">Neon Pantheon</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#08060f"></span><span class="sw" style="background:#ff2fb0"></span><span class="sw" style="background:#21e6ff"></span></div>
+          <p class="channels">Hermes × Cyberpunk — neon temple</p>
+          <p class="fonts">Cinzel / Sora / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 6 -->
+      <article class="tile wide glow duo" style="--bg:#140a1f;--fg:#ffe9f5;--accent:#ff5c8a;--accent2:#7a5cff;--display:'Orbitron';--body:'Sora';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">06</span><span class="tname">Synthwave Hellas</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#140a1f"></span><span class="sw" style="background:#ff5c8a"></span><span class="sw" style="background:#7a5cff"></span></div>
+          <p class="channels">Cyberpunk — retro-future synthwave</p>
+          <p class="fonts">Orbitron / Sora / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 7 -->
+      <article class="tile wide glow" style="--bg:#06121a;--fg:#e2f0ee;--accent:#35e0d0;--display:'Marcellus';--body:'Newsreader';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">07</span><span class="tname">Ion Temple</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#06121a"></span><span class="sw" style="background:#e2f0ee"></span><span class="sw" style="background:#35e0d0"></span></div>
+          <p class="channels">Hermes × Cyberpunk — aqua, disciplined</p>
+          <p class="fonts">Marcellus / Newsreader / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 8 -->
+      <article class="tile duo" style="--bg:#10131a;--fg:#e9edf2;--accent:#7fd4ff;--accent2:#c8d2dd;--display:'Cormorant Garamond';--body:'Sora';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">08</span><span class="tname">Chrome Delphi</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#10131a"></span><span class="sw" style="background:#7fd4ff"></span><span class="sw" style="background:#c8d2dd"></span></div>
+          <p class="channels">ampcode × Cyberpunk — chrome &amp; electric blue</p>
+          <p class="fonts">Cormorant / Sora / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 9 -->
+      <article class="tile" style="--bg:#0a0c08;--fg:#eef0e6;--accent:#b6ff2e;--display:'Marcellus';--body:'Sora';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">09</span><span class="tname">Acid Agora</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#0a0c08"></span><span class="sw" style="background:#eef0e6"></span><span class="sw" style="background:#b6ff2e"></span></div>
+          <p class="channels">Cyberpunk × ampcode — acid, restrained</p>
+          <p class="fonts">Marcellus / Sora / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 10 -->
+      <article class="tile" style="--bg:#0e1116;--fg:#e7e6e1;--accent:#c9a24b;--display:'Fraunces';--body:'Newsreader';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">10</span><span class="tname">Nocturne</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#0e1116"></span><span class="sw" style="background:#e7e6e1"></span><span class="sw" style="background:#c9a24b"></span></div>
+          <p class="channels">every.to × Hermes — quiet editorial, dark</p>
+          <p class="fonts">Fraunces / Newsreader / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 11 -->
+      <article class="tile glow duo" style="--bg:#0a0a0d;--fg:#e8e6df;--accent:#ffb020;--accent2:#34d1e6;--display:'Chakra Petch';--body:'Sora';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">11</span><span class="tname">Hermes Protocol</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline" style="font-weight:600;">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#0a0a0d"></span><span class="sw" style="background:#ffb020"></span><span class="sw" style="background:#34d1e6"></span></div>
+          <p class="channels">ampcode × Hermes — agent console, mythic</p>
+          <p class="fonts">Chakra Petch / Sora / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 12 -->
+      <article class="tile" style="--bg:#120b0a;--fg:#f0e6dd;--accent:#ff4d3d;--display:'Cormorant Garamond';--body:'Newsreader';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">12</span><span class="tname">Vermilion Myth</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#120b0a"></span><span class="sw" style="background:#f0e6dd"></span><span class="sw" style="background:#ff4d3d"></span></div>
+          <p class="channels">every.to × Hermes — bold editorial</p>
+          <p class="fonts">Cormorant / Newsreader / Plex Mono</p>
+        </div>
+      </article>
+
+      <!-- 13 -->
+      <article class="tile wide glow duo aurora scan" style="--bg:#060b14;--fg:#e6f2ff;--accent:#48f0c0;--accent2:#ff6ad5;--display:'Audiowide';--body:'Sora';--mono:'IBM Plex Mono';">
+        <div class="tile-top"><span class="idx">13</span><span class="tname">Aurora Cyberpunk</span></div>
+        <p class="eyebrow">Essay · Programming</p>
+        <h2 class="headline">From Patterns to Programs</h2>
+        <p class="meta">Emiliano · 4 min · Aug 2026</p>
+        <p class="excerpt">What cutting fabric taught me about cutting scope — the surprising overlap between tailoring and software.</p>
+        <a class="read" href="#">Read →</a>
+        <div class="tile-foot">
+          <div class="swatches"><span class="sw" style="background:#060b14"></span><span class="sw" style="background:#48f0c0"></span><span class="sw" style="background:#ff6ad5"></span></div>
+          <p class="channels">Cyberpunk (max) — aurora atmosphere</p>
+          <p class="fonts">Audiowide / Sora / Plex Mono</p>
+        </div>
+      </article>
+
+    </main>
+
+    <p class="foot-note">Same article, thirteen skins · pick one (or mix numbers) and I'll build the real design system</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  var c = document.getElementById('pagestars');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stars = [], w, h;
+  function resize() {
+    w = c.width = window.innerWidth; h = c.height = window.innerHeight;
+    var n = Math.min(160, Math.floor(w * h / 12000));
+    stars = [];
+    for (var i = 0; i < n; i++) stars.push({
+      x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.1 + 0.2,
+      base: Math.random() * 0.4 + 0.15, tw: Math.random() * 0.02 + 0.004, ph: Math.random() * 6.28
+    });
+  }
+  function draw(t) {
+    ctx.clearRect(0, 0, w, h);
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      var a = reduce ? s.base : s.base + Math.sin(t * s.tw + s.ph) * 0.22;
+      if (a < 0.04) a = 0.04;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283);
+      ctx.fillStyle = 'rgba(220,224,238,' + a + ')'; ctx.fill();
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  resize(); window.addEventListener('resize', resize);
+  if (reduce) draw(0); else requestAnimationFrame(draw);
+})();
+</script>

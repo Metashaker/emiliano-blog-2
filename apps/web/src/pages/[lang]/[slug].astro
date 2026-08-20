@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MeanderDivider from '../../components/MeanderDivider.astro';
+import { getPosts, getTranslation, type Post } from '../../lib/ghost';
+import { locales, useTranslations, otherLang, type Lang } from '../../i18n/ui';
+import { formatDate } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of locales) {
+    const posts = await getPosts(lang);
+    for (const post of posts) {
+      const translation = await getTranslation(post, otherLang(lang));
+      paths.push({
+        params: { lang, slug: post.slug },
+        props: { post, translationSlug: translation?.slug ?? null },
+      });
+    }
+  }
+  return paths;
+}
+
+interface Props {
+  post: Post;
+  translationSlug: string | null;
+}
+
+const { post, translationSlug } = Astro.props;
+const lang = post.lang;
+const t = useTranslations(lang);
+const other = otherLang(lang);
+const switchHref = translationSlug ? `/${other}/${translationSlug}/` : null;
+---
+<BaseLayout
+  lang={lang}
+  switchHref={switchHref}
+  title={post.title}
+  description={post.excerpt}
+>
+  <article class="article">
+    <header class="wrap article-header reveal">
+      <div class="meta">
+        <time datetime={post.publishedAt}>{formatDate(post.publishedAt, lang)}</time>
+        {post.readingTime && <span>{post.readingTime} {t('post.readingTime')}</span>}
+      </div>
+      <h1>{post.title}</h1>
+    </header>
+
+    {post.featureImage && (
+      <img class="article-feature" src={post.featureImage} alt="" loading="lazy" />
+    )}
+
+    <div class="prose reveal" set:html={post.html} />
+
+    <MeanderDivider />
+
+    <footer class="article-footer">
+      <a class="back-link" href={`/${lang}/`}>{t('post.backToWriting')}</a>
+    </footer>
+  </article>
+</BaseLayout>

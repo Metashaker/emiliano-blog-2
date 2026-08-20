@@ -1,0 +1,71 @@
+---
+import '../styles/global.css';
+import Starfield from '../components/Starfield.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  switchHref?: string | null;
+}
+
+const { lang, title, description, switchHref = null } = Astro.props;
+const t = useTranslations(lang);
+const fullTitle = title ? `${title} — ${t('site.title')}` : t('site.title');
+const desc = description ?? t('site.tagline');
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="alternate" type="application/rss+xml" title={`${t('site.title')} (${lang})`} href={`/${lang}/rss.xml`} />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <div id="progress"></div>
+    <Starfield />
+    <SiteHeader lang={lang} switchHref={switchHref} />
+    <main>
+      <slot />
+    </main>
+    <SiteFooter lang={lang} />
+    <script>
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+      const p = document.getElementById('progress');
+      if (p) {
+        const update = () => {
+          const h = document.documentElement;
+          const max = h.scrollHeight - h.clientHeight;
+          p.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+        };
+        window.addEventListener('scroll', update, { passive: true });
+        update();
+      }
+    </script>
+  </body>
+</html>

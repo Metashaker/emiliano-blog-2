@@ -1,0 +1,435 @@
+<title>Aether — Article Mockups</title>
+<style>
+/* __FONT_FACES__ */
+
+/* ===== Theme tokens ===== */
+:root {
+  --measure: 68ch;
+  --wide: 940px;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+[data-theme="gilded"] {
+  --bg:#0b0a12; --panel:#13111f; --line:#272238; --fg:#e8e2d0; --muted:#9a9384;
+  --accent:#d4af37; --accent-soft:#e6c968; --glow:transparent;
+  --display:"Cinzel", serif; --body:"Newsreader", Georgia, serif; --caps:1;
+}
+[data-theme="marble"] {
+  --bg:#0a0d18; --panel:#111528; --line:#232b45; --fg:#ece7da; --muted:#8b93ad;
+  --accent:#c9a24b; --accent-soft:#e3c987; --glow:transparent;
+  --display:"Cormorant Garamond", serif; --body:"Sora", sans-serif; --caps:0;
+}
+[data-theme="ember"] {
+  --bg:#0c0b0a; --panel:#161311; --line:#2c2620; --fg:#ece6dd; --muted:#8f8579;
+  --accent:#ff7a1a; --accent-soft:#ffa457; --glow:color-mix(in srgb, #ff7a1a 50%, transparent);
+  --display:"Chakra Petch", sans-serif; --body:"Sora", sans-serif; --caps:0;
+}
+[data-theme="vermilion"] {
+  --bg:#120b0a; --panel:#1c110f; --line:#33211d; --fg:#f0e6dd; --muted:#9a8a80;
+  --accent:#e5473a; --accent-soft:#ff6f5f; --glow:transparent;
+  --display:"Cormorant Garamond", serif; --body:"Newsreader", Georgia, serif; --caps:0;
+}
+[data-theme="plasma"] {
+  --bg:#0a0c08; --panel:#12140d; --line:#242a1a; --fg:#eef0e6; --muted:#8b8d7f;
+  --accent:#a6e22e; --accent-soft:#c6f95a; --glow:color-mix(in srgb, #a6e22e 45%, transparent);
+  --display:"Marcellus", serif; --body:"Sora", sans-serif; --caps:0;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 19px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+#stars { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.8; }
+.doc { position: relative; z-index: 1; }
+
+.wrap { max-width: var(--wide); margin: 0 auto; padding: 0 24px; }
+.measure { max-width: var(--measure); margin-inline: auto; }
+
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.1; text-wrap: balance; }
+a { color: var(--accent-soft); }
+
+/* ===== Switcher + progress ===== */
+.switcher {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.switcher .lbl {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--muted); margin-right: 6px;
+}
+.switcher button {
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em;
+  color: var(--muted); background: transparent;
+  border: 1px solid var(--line); border-radius: 4px;
+  padding: 6px 11px; cursor: pointer; transition: all 0.18s ease;
+}
+.switcher button:hover { color: var(--fg); border-color: var(--muted); }
+.switcher button[aria-pressed="true"] {
+  color: var(--accent); border-color: var(--accent);
+  box-shadow: 0 0 14px var(--glow);
+}
+#progress {
+  position: fixed; top: 0; left: 0; height: 2px; width: 0%; z-index: 60;
+  background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+}
+
+/* ===== Hero ===== */
+.hero { position: relative; padding: 150px 0 70px; overflow: hidden; }
+.hero-art {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+  will-change: transform;
+}
+.orbit { width: min(680px, 92vw); height: min(680px, 92vw); opacity: 0.5; }
+.orbit .ring { fill: none; stroke: var(--accent); stroke-width: 0.6; opacity: 0.5; }
+.orbit .ring2 { stroke: var(--accent-soft); opacity: 0.28; }
+.orbit .planet { fill: var(--accent); }
+.orbit .spin { transform-origin: 200px 200px; }
+@media (prefers-reduced-motion: no-preference) {
+  .orbit .spin { animation: spin 60s linear infinite; }
+  .orbit .spin.rev { animation-duration: 90s; animation-direction: reverse; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.hero-inner { position: relative; z-index: 1; }
+.eyebrow {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent); margin: 0 0 20px;
+}
+.title {
+  font-size: clamp(40px, 8vw, 84px);
+  margin: 0 0 22px; color: var(--fg);
+  text-shadow: 0 0 40px var(--glow);
+}
+[data-theme] .title { text-transform: none; }
+[data-caps] .title, [data-caps] .sect { text-transform: uppercase; letter-spacing: 0.03em; }
+.deck {
+  font-family: var(--body); font-size: clamp(19px, 2.4vw, 24px);
+  color: var(--muted); max-width: 46ch; margin: 0 0 32px; line-height: 1.5;
+}
+.byline {
+  font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.05em;
+  color: var(--muted); display: flex; gap: 18px; flex-wrap: wrap;
+}
+.byline b { color: var(--fg); font-weight: 500; }
+
+/* ===== Prose ===== */
+.article { padding: 20px 0 60px; }
+.prose { font-size: 19px; }
+.prose > * + * { margin-top: 1.4em; }
+.prose p { margin: 0; }
+.prose .lead::first-letter {
+  font-family: var(--display); float: left; font-size: 3.4em; line-height: 0.82;
+  padding: 6px 12px 0 0; color: var(--accent);
+}
+.sect {
+  font-size: clamp(26px, 4vw, 38px); margin: 1.8em 0 0.2em; color: var(--fg);
+}
+.sect .no {
+  font-family: var(--mono); font-size: 13px; letter-spacing: 0.1em;
+  color: var(--accent); display: block; margin-bottom: 8px; -webkit-text-fill-color: var(--accent);
+}
+.pull {
+  font-family: var(--display); font-size: clamp(24px, 3.6vw, 34px);
+  line-height: 1.25; color: var(--accent-soft); text-wrap: balance;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: 28px 0; margin: 44px 0;
+}
+.prose blockquote {
+  border-left: 2px solid var(--accent); margin: 0; padding-left: 22px;
+  color: var(--muted); font-style: italic;
+}
+.prose ul { padding-left: 20px; color: var(--fg); }
+.prose li { margin-bottom: 8px; }
+.prose li::marker { color: var(--accent); }
+
+/* ===== Figures ===== */
+figure { margin: 48px auto; max-width: var(--wide); }
+figure.reveal-scale .figbox { transform: scale(0.98); opacity: 0; transition: all 0.7s ease; }
+figure.reveal-scale.in .figbox { transform: none; opacity: 1; }
+.figbox {
+  background: color-mix(in srgb, var(--panel) 80%, transparent);
+  border: 1px solid var(--line); border-radius: 10px; padding: 26px;
+}
+figcaption {
+  font-family: var(--mono); font-size: 12px; color: var(--muted);
+  margin-top: 14px; letter-spacing: 0.03em; text-align: center;
+}
+.diagram { width: 100%; height: auto; display: block; }
+.diagram .node { fill: var(--panel); stroke: var(--accent); stroke-width: 1.4; }
+.diagram .node-fg { fill: var(--fg); font-family: var(--mono); font-size: 11px; }
+.diagram .edge { stroke: var(--line); stroke-width: 1.4; fill: none; }
+.diagram .pulse {
+  stroke: var(--accent); stroke-width: 2.2; fill: none;
+  stroke-dasharray: 8 240; stroke-linecap: round;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .in .diagram .pulse { animation: dash 3.2s linear infinite; }
+}
+@keyframes dash { to { stroke-dashoffset: -248; } }
+
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .area { fill: color-mix(in srgb, var(--accent) 16%, transparent); }
+.chart .line { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.chart .clip-rect { transition: width 1.1s cubic-bezier(.2,.7,.2,1); }
+
+/* meander divider */
+.meander { display: block; margin: 60px auto; width: 220px; height: 20px; opacity: 0.6; }
+.meander path { stroke: var(--accent); stroke-width: 2; fill: none; }
+
+/* reveals */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal, figure.reveal-scale .figbox { opacity: 1 !important; transform: none !important; }
+}
+
+/* ===== end matter ===== */
+.author {
+  display: flex; gap: 18px; align-items: center; margin: 10px auto 0;
+  padding: 24px; border: 1px solid var(--line); border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+}
+.author .av {
+  width: 54px; height: 54px; border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 30% 30%, var(--accent-soft), var(--accent));
+}
+.author .who { font-family: var(--display); font-size: 20px; color: var(--fg); }
+.author .bio { font-family: var(--mono); font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+.more { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 40px auto 0; }
+.more a {
+  text-decoration: none; color: inherit; padding: 22px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 55%, transparent); transition: all 0.2s ease;
+}
+.more a:hover { border-color: var(--accent); transform: translateY(-3px); }
+.more .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+.more .t { font-family: var(--display); font-size: 21px; color: var(--fg); margin-top: 8px; }
+
+footer.site {
+  border-top: 1px solid var(--line); margin-top: 60px; padding: 30px 0 70px;
+  font-family: var(--mono); font-size: 12px; color: var(--muted);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+@media (max-width: 560px) { .more { grid-template-columns: 1fr; } body { font-size: 17.5px; } }
+</style>
+
+<div id="progress"></div>
+<nav class="switcher" aria-label="Design direction">
+  <span class="lbl">Direction</span>
+  <button data-set="gilded" aria-pressed="true">01 · Gilded Void</button>
+  <button data-set="marble" aria-pressed="false">02 · Marble &amp; Machine</button>
+  <button data-set="ember" aria-pressed="false">03 · Ember Terminal</button>
+  <button data-set="vermilion" aria-pressed="false">04 · Vermilion Myth</button>
+  <button data-set="plasma" aria-pressed="false">05 · Plasma Agora</button>
+</nav>
+
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<div class="doc">
+  <header class="hero">
+    <div class="hero-art" id="heroArt">
+      <svg class="orbit" viewBox="0 0 400 400" aria-hidden="true">
+        <circle class="ring" cx="200" cy="200" r="170" />
+        <circle class="ring ring2" cx="200" cy="200" r="120" />
+        <circle class="ring" cx="200" cy="200" r="70" />
+        <g class="spin">
+          <circle class="planet" cx="370" cy="200" r="5" />
+          <circle class="planet" cx="200" cy="30" r="3" opacity="0.7" />
+        </g>
+        <g class="spin rev">
+          <circle class="planet" cx="320" cy="200" r="3.5" opacity="0.8" />
+        </g>
+      </svg>
+    </div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow reveal">Essay · Programming &amp; Craft</p>
+      <h1 class="title reveal">From Patterns to Programs</h1>
+      <p class="deck reveal">What a decade of cutting fabric taught me about cutting scope — and why the best engineers I know think like tailors.</p>
+      <div class="byline reveal">
+        <span><b>Emiliano</b></span>
+        <span>August 14, 2026</span>
+        <span>7 min read</span>
+      </div>
+    </div>
+  </header>
+
+  <article class="article">
+    <div class="wrap">
+      <div class="prose measure">
+        <p class="lead reveal">For a decade my instruments were shears, tailor's chalk, and a dress form the exact shape of a stranger. A garment is not decoration; it is a system — the constraints of a body, a cloth, and a movement resolved into a single object that has to hold together when someone reaches for a door. When I started writing software, the tools changed and almost nothing else did.</p>
+
+        <p class="reveal">A pattern, I realized, is an interface. A seam is a contract. And a bad fit, like a bad abstraction, announces itself the instant someone tries to move.</p>
+
+        <h2 class="sect reveal"><span class="no">01</span>The body is the spec</h2>
+        <p class="reveal">The blank canvas is a myth sold to people who have never shipped anything. In fashion, the body is the specification — non-negotiable, particular, indifferent to your taste. In software, the problem is. The discipline is identical: you listen to the constraint before you cut, because every cut you make in ignorance you pay for twice in alteration.</p>
+      </div>
+
+      <figure class="reveal-scale">
+        <div class="figbox">
+          <svg class="diagram" viewBox="0 0 900 260" role="img" aria-label="A garment mapped to a software system: body to problem, pattern to interface, seam to contract.">
+            <path class="edge" d="M150,130 H360" /><path class="edge" d="M540,130 H750" />
+            <path class="pulse" d="M150,130 H360" /><path class="pulse" d="M540,130 H750" />
+            <g>
+              <rect class="node" x="40" y="90" width="110" height="80" rx="8" />
+              <text class="node-fg" x="95" y="126" text-anchor="middle">the</text>
+              <text class="node-fg" x="95" y="142" text-anchor="middle">body</text>
+            </g>
+            <g>
+              <rect class="node" x="395" y="90" width="110" height="80" rx="8" />
+              <text class="node-fg" x="450" y="126" text-anchor="middle">the</text>
+              <text class="node-fg" x="450" y="142" text-anchor="middle">pattern</text>
+            </g>
+            <g>
+              <rect class="node" x="750" y="90" width="110" height="80" rx="8" />
+              <text class="node-fg" x="805" y="126" text-anchor="middle">the</text>
+              <text class="node-fg" x="805" y="142" text-anchor="middle">seam</text>
+            </g>
+            <text class="node-fg" x="255" y="118" text-anchor="middle" opacity="0.7">is spec for</text>
+            <text class="node-fg" x="645" y="118" text-anchor="middle" opacity="0.7">is contract at</text>
+          </svg>
+          <figcaption>Fig. 1 — The same object under two vocabularies. (Feature posts render animated diagrams like this as Astro islands.)</figcaption>
+        </div>
+      </figure>
+
+      <div class="wrap">
+        <div class="prose measure">
+          <h2 class="sect reveal"><span class="no">02</span>Seams are contracts</h2>
+          <p class="reveal">Where two panels meet, a seam decides whether the whole thing moves or tears. Software has the same joints — the places where two modules meet and agree on what they owe each other. Sloppy there and it holds only until real force arrives, which in both trades means: a real person, doing a real thing, at the worst possible moment.</p>
+        </div>
+      </div>
+
+      <div class="wrap"><div class="measure">
+        <p class="pull reveal">Elegance is not the absence of seams. It is seams placed exactly where the body bends.</p>
+      </div></div>
+
+      <div class="wrap"><div class="prose measure">
+        <p class="reveal">You cannot hide a seam. You can only choose where it goes — and the choice, made well, disappears into the way the thing moves. That is the whole job, in cloth or in code.</p>
+
+        <h2 class="sect reveal"><span class="no">03</span>Measure twice</h2>
+        <p class="reveal">Every tailor learns the arithmetic of waste. Cut greedily and you run out of cloth on the last panel; cut with a plan and the same yardage yields the garment and a pocket square besides. Estimating engineering work is the identical muscle: the cost is set long before you touch the material.</p>
+      </div></div>
+
+      <figure class="reveal-scale">
+        <div class="figbox">
+          <svg class="diagram chart" viewBox="0 0 900 300" role="img" aria-label="Rework falling over five projects as planning improves.">
+            <line class="grid" x1="60" y1="250" x2="860" y2="250" />
+            <line class="grid" x1="60" y1="170" x2="860" y2="170" opacity="0.5" />
+            <line class="grid" x1="60" y1="90" x2="860" y2="90" opacity="0.5" />
+            <clipPath id="reveal-clip"><rect id="clipRect" class="clip-rect" x="60" y="0" width="0" height="300" /></clipPath>
+            <g clip-path="url(#reveal-clip)">
+              <path class="area" d="M60,120 L260,150 L460,200 L660,225 L860,240 L860,250 L60,250 Z" />
+              <path class="line" d="M60,120 L260,150 L460,200 L660,225 L860,240" />
+            </g>
+            <text class="node-fg" x="60" y="275" opacity="0.7">P1</text>
+            <text class="node-fg" x="855" y="275" text-anchor="end" opacity="0.7">P5</text>
+            <text class="node-fg" x="60" y="80" opacity="0.7">rework</text>
+          </svg>
+          <figcaption>Fig. 2 — Rework per project, as planning replaces improvisation. Animates on scroll.</figcaption>
+        </div>
+      </figure>
+
+      <svg class="meander" viewBox="0 0 240 20" aria-hidden="true">
+        <path d="M2,18 V6 H14 V14 H8 M26,18 V6 H38 V14 H32 M50,18 V6 H62 V14 H56 M74,18 V6 H86 V14 H80 M98,18 V6 H110 V14 H104 M122,18 V6 H134 V14 H128 M146,18 V6 H158 V14 H152 M170,18 V6 H182 V14 H176 M194,18 V6 H206 V14 H200 M218,18 V6 H230 V14 H224" />
+      </svg>
+
+      <div class="wrap"><div class="prose measure">
+        <h2 class="sect reveal"><span class="no">04</span>The long game</h2>
+        <p class="reveal">A good coat outlives the season it was made for; good software outlives the sprint. Both reward the same unglamorous virtues — restraint, legible structure, respect for whoever has to alter it next. I changed careers and kept the craft. This blog is where I write down what carried over.</p>
+        <blockquote class="reveal">Make it hold when someone reaches for the door.</blockquote>
+      </div></div>
+
+      <div class="wrap"><div class="measure">
+        <div class="author reveal">
+          <div class="av" aria-hidden="true"></div>
+          <div>
+            <div class="who">Emiliano</div>
+            <div class="bio">Fashion designer turned engineer. Writing on books, work, and building.</div>
+          </div>
+        </div>
+        <div class="more">
+          <a href="#"><div class="k">Next</div><div class="t">Seeing Like a Tailor</div></a>
+          <a href="#"><div class="k">Reading log</div><div class="t">Three Books, One Idea</div></a>
+        </div>
+      </div></div>
+    </div>
+
+    <footer class="site"><div class="wrap" style="display:flex;justify-content:space-between;width:100%;">
+      <span>© 2026 Aether</span><span>Ghost · Astro · Cloudflare</span>
+    </div></footer>
+  </article>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  root.setAttribute('data-theme', 'gilded');
+  function applyCaps(theme) {
+    if (theme === 'gilded') root.setAttribute('data-caps', '');
+    else root.removeAttribute('data-caps');
+  }
+  applyCaps('gilded');
+  var btns = Array.prototype.slice.call(document.querySelectorAll('.switcher button'));
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var theme = b.getAttribute('data-set');
+      root.setAttribute('data-theme', theme);
+      applyCaps(theme);
+      btns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    });
+  });
+
+  // reading progress
+  var progress = document.getElementById('progress');
+  function onScroll() {
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    progress.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+    var art = document.getElementById('heroArt');
+    if (art) art.style.transform = 'translateY(' + (h.scrollTop * 0.25) + 'px)';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // reveals + chart
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        var clip = e.target.querySelector && e.target.querySelector('#clipRect');
+        if (clip) clip.setAttribute('width', '800');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.18 });
+  document.querySelectorAll('.reveal, .reveal-scale, figure').forEach(function (el) { io.observe(el); });
+
+  // starfield
+  var c = document.getElementById('stars'), ctx = c.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var st = [], w, h;
+  function rs() {
+    w = c.width = window.innerWidth; h = c.height = window.innerHeight;
+    var n = Math.min(180, Math.floor(w * h / 10000)); st = [];
+    for (var i = 0; i < n; i++) st.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.2 + 0.2, b: Math.random() * 0.45 + 0.15, t: Math.random() * 0.02 + 0.004, p: Math.random() * 6.28 });
+  }
+  function dr(tm) {
+    ctx.clearRect(0, 0, w, h);
+    for (var i = 0; i < st.length; i++) { var s = st[i]; var a = reduce ? s.b : s.b + Math.sin(tm * s.t + s.p) * 0.22; if (a < 0.04) a = 0.04; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fillStyle = 'rgba(224,224,236,' + a + ')'; ctx.fill(); }
+    if (!reduce) requestAnimationFrame(dr);
+  }
+  rs(); window.addEventListener('resize', rs); if (reduce) dr(0); else requestAnimationFrame(dr);
+})();
+</script>
